@@ -1,0 +1,14 @@
+[package]
+name = "emojfuscate_cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "emojfuscate"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5.4", features = ["derive"] }
+hex = "0.4.3"
+emojfuscate = "0.1.0"
+uuid = "1.8.0"
