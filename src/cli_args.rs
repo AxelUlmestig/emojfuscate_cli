@@ -13,16 +13,20 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     Encode {
+        /// Data to emojfuscate, pass a dash (-) to read from stdin
         input: String,
         #[arg(short, long, default_value_t = DataType::Text)]
         data_type: DataType,
+        /// Will append a line break at the end of the output if set
         #[arg(short, long)]
         line_break: bool,
     },
     Decode {
+        /// data to demojfuscate, pass a dash (-) to read from stdin
         input: String,
         #[arg(short, long, default_value_t = DataType::Text)]
         data_type: DataType,
+        /// Will append a line break at the end of the output if set
         #[arg(short, long)]
         line_break: bool,
     },
