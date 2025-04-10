@@ -4,6 +4,7 @@ build = "build.rs"
 name = "emojfuscate_cli"
 version = "0.1.0"
 edition = "2021"
+readme = "README.md"
 
 [[bin]]
 name = "emojfuscate"
