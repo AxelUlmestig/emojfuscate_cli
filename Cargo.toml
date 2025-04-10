@@ -5,6 +5,10 @@ name = "emojfuscate_cli"
 version = "0.1.0"
 edition = "2021"
 readme = "README.md"
+license = "MIT"
+include = [
+  "LICENSE"
+]
 
 [[bin]]
 name = "emojfuscate"
