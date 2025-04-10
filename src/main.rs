@@ -1,78 +1,34 @@
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::Parser;
 use hex;
 use std::io;
 use std::io::BufWriter;
 use std::io::Read;
 use std::io::Write;
 use std::process::ExitCode;
-use std::str;
 use uuid::Uuid;
 
 use emojfuscate::{
     ByteInSequence, Demojfuscate, Emojfuscate, EmojfuscateByteStream, FromEmojiError,
     IsEmojiRepresentation,
 };
+mod cli_args;
 mod hex_stream;
 
-#[derive(Parser)]
-#[command(version, about, long_about = None)]
-#[command(propagate_version = true)]
-struct Cli {
-    #[command(subcommand)]
-    command: Commands,
-}
-
-#[derive(Subcommand)]
-enum Commands {
-    Encode {
-        input: String,
-        #[arg(short, long, default_value_t = DataType::Text)]
-        data_type: DataType,
-        #[arg(short, long)]
-        line_break: bool,
-    },
-    Decode {
-        input: String,
-        #[arg(short, long, default_value_t = DataType::Text)]
-        data_type: DataType,
-        #[arg(short, long)]
-        line_break: bool,
-    },
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-enum DataType {
-    Text,
-    UUID,
-    Hexadecimal,
-}
-
-impl std::fmt::Display for DataType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let stringified = match self {
-            DataType::Text => "text",
-            DataType::UUID => "uuid",
-            DataType::Hexadecimal => "hexadecimal",
-        };
-        write!(f, "{}", stringified)
-    }
-}
-
 fn main() -> ExitCode {
-    let cli = Cli::parse();
+    let cli = cli_args::Cli::parse();
 
     let unwrapped_std_in = io::stdin().bytes().map(|b| b.unwrap());
 
     let mut stream = BufWriter::new(io::stdout());
 
     match &cli.command {
-        Commands::Encode {
+        cli_args::Commands::Encode {
             line_break,
             data_type,
             input,
         } => {
             match &data_type {
-                DataType::UUID => {
+                cli_args::DataType::UUID => {
                     let uuid = match input.as_str() {
                         "-" => Uuid::parse_str(
                             std::str::from_utf8(&unwrapped_std_in.collect::<Vec<u8>>()).unwrap(),
@@ -85,7 +41,7 @@ fn main() -> ExitCode {
                         stream.write(emoji.to_string().as_bytes()).unwrap();
                     }
                 }
-                DataType::Hexadecimal => match input.as_str() {
+                cli_args::DataType::Hexadecimal => match input.as_str() {
                     "-" => {
                         for emoji in
                             hex_stream::HexStream::new(unwrapped_std_in).emojfuscate_stream()
@@ -101,7 +57,7 @@ fn main() -> ExitCode {
                         }
                     }
                 },
-                DataType::Text => match input.as_str() {
+                cli_args::DataType::Text => match input.as_str() {
                     "-" => {
                         for emoji in unwrapped_std_in.emojfuscate_byte_stream() {
                             stream.write(emoji.to_string().as_bytes()).unwrap();
@@ -119,13 +75,13 @@ fn main() -> ExitCode {
                 stream.write("\n".as_bytes()).unwrap();
             }
         }
-        Commands::Decode {
+        cli_args::Commands::Decode {
             line_break,
             data_type,
             input,
         } => {
             match &data_type {
-                DataType::UUID => {
+                cli_args::DataType::UUID => {
                     let r_uuid: Result<Uuid, FromEmojiError> = match input.as_str() {
                         "-" => unwrapped_std_in.demojfuscate(),
                         some_string => some_string.bytes().demojfuscate(),
@@ -171,7 +127,7 @@ fn main() -> ExitCode {
                         }
                     }
                 }
-                DataType::Hexadecimal => match input.as_str() {
+                cli_args::DataType::Hexadecimal => match input.as_str() {
                     "-" => {
                         for parsed_byte in unwrapped_std_in.demojfuscate_byte_stream() {
                             let byte = match parsed_byte {
@@ -193,7 +149,7 @@ fn main() -> ExitCode {
                         }
                     }
                 },
-                DataType::Text => match input.as_str() {
+                cli_args::DataType::Text => match input.as_str() {
                     "-" => {
                         for parsed_byte in unwrapped_std_in.demojfuscate_byte_stream() {
                             let byte = match parsed_byte {
