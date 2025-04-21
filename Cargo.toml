@@ -18,7 +18,7 @@ path = "src/main.rs"
 clap = { version = "4.5.4", features = ["derive"] }
 clap_complete = "4.5.47"
 hex = "0.4.3"
-emojfuscate = "0.1.0"
+emojfuscate = "0.2.0"
 uuid = "1.8.0"
 
 [build-dependencies]
