@@ -16,6 +16,7 @@
           pkgs.rustc
           pkgs.cargo
           pkgs.rustfmt
+          pkgs.bats
         ];
       };
     }
