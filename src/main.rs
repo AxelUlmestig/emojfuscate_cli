@@ -29,14 +29,15 @@ fn main() -> ExitCode {
         } => {
             match &data_type {
                 cli_args::DataType::UUID => {
-                    let uuid = match input.as_str() {
-                        "-" => Uuid::parse_str(
-                            std::str::from_utf8(&unwrapped_std_in.collect::<Vec<u8>>()).unwrap(),
-                        )
-                        .unwrap(),
-                        uuid_string => Uuid::parse_str(uuid_string).unwrap(),
+                    let uuid_string = match input.as_str() {
+                        "-" => {
+                            let bytes = unwrapped_std_in.collect::<Vec<u8>>();
+                            String::from_utf8(bytes).unwrap()
+                        }
+                        uuid_str => uuid_str.to_owned(),
                     };
 
+                    let uuid = Uuid::parse_str(&uuid_string.trim()).unwrap();
                     for emoji in uuid.emojfuscate_stream() {
                         stream.write(emoji.to_string().as_bytes()).unwrap();
                     }

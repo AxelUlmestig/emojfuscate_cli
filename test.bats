@@ -69,6 +69,13 @@ cli=./target/debug/emojfuscate
   [ "$roundtrip_message" = "$original_message" ]
 }
 
+@test "uuid: handle whitespace" {
+  original_message="29f5467d-b8bf-4878-b0c3-57c72f9b9cd1"
+  roundtrip_message=$(echo "$original_message" | $cli encode -d uuid - | $cli decode -d uuid -)
+
+  [ "$roundtrip_message" = "$original_message" ]
+}
+
 
 
 @test "hexadecimal: direct argument to direct argument" {
