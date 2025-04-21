@@ -1,4 +1,4 @@
-use clap_complete::{generate_to, shells::Bash};
+use clap_complete::{generate_to, Shell};
 use std::env;
 use std::io::Error;
 
@@ -11,14 +11,16 @@ fn main() -> Result<(), Error> {
     };
 
     let mut cmd = Cli::command();
-    let path = generate_to(
-        Bash,
-        &mut cmd,      // We need to specify what generator to use
-        "emojfuscate", // We need to specify the bin name manually
-        outdir,        // We need to specify where to write to
-    )?;
+    for shell in [Shell::Bash, Shell::Zsh] {
+        let path = generate_to(
+            shell,
+            &mut cmd,      // We need to specify what generator to use
+            "emojfuscate", // We need to specify the bin name manually
+            &outdir,       // We need to specify where to write to
+        )?;
 
-    println!("cargo:warning=completion file is generated: {path:?}");
+        println!("cargo:warning={shell:?} completion file is generated: {path:?}");
+    }
 
     Ok(())
 }
